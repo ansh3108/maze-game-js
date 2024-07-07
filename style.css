@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
-html, body
-{
+
+html, body {
     width: 100vw;
     height: 100vh;
     position: fixed;
@@ -21,7 +21,6 @@ html, body
     margin-top: 30px;
 }
 
-
 #mazeContainer 
 {
     top: 15px;
@@ -39,8 +38,7 @@ html, body
     height: 400px;
 }
 
-
-input, select
+input, select 
 {
     cursor: pointer;
     background-color: rgba(0, 0, 0, 0.30);
@@ -59,25 +57,26 @@ input, select
 
 input:hover, select:hover 
 {
-    background-color: rgba(0, 0, 0, 0.70);
+	background-color: rgba(0, 0, 0, 0.70);
 }
 
 input:active, select:active 
 {
-    background-color: black;
+	background-color: black;
 }
 
-input:focus, select:focus
+input:focus, select:focus 
 {
-    outline: none;
+	outline: none;
 }
 
 .custom-select 
 {
-    display: inline-block;
+	display: inline-block;
 }
 
-.custom-select select
+
+.custom-select select 
 {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -85,7 +84,6 @@ input:focus, select:focus
     background-repeat: no-repeat;
     background-position: 125px center;
 }
-
 
 #Message-Container 
 {
@@ -103,8 +101,8 @@ input:focus, select:focus
     z-index: 1;
 }
 
-#Message-Container #message 
-{
+#Message-Container #message
+ {
     width: 300px;
     height: 300px;
     position: fixed;
@@ -114,12 +112,12 @@ input:focus, select:focus
     margin-top: -150px;
 }
 
-#page 
-{
-    text-align: center;
-    height: auto;
-    width: auto;
-    margin: auto;
+#page
+ {
+	text-align: center;
+	height: auto;
+	width: auto;
+	margin: auto;
 }
 
 #page #menu
@@ -130,8 +128,8 @@ input:focus, select:focus
     box-sizing: border-box;
 }
 
-#page #menu h1 
-{
+#page #menu h1
+ {
     margin: 0;
     margin-bottom: 10px;
     font-weight: 600;
@@ -149,22 +147,22 @@ input:focus, select:focus
     height: auto;
 }
 
-.border
- {
+.border 
+{
     border: 10px black solid;
     border-radius: 10px;
 }
 
 
-#instructions
- {
+#instructions 
+{
     margin-top: 425px;
 }
-
+ 
 
 @media only screen and (max-width: 400px) 
 {
-    input, select {
-        width: 120px;
-    }
+	input, select {
+	    width: 120px;
+	}
 }
