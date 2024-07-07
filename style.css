@@ -1,0 +1,50 @@
+body 
+{
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #282c34;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+
+#gameContainer 
+{
+    position: relative;
+    width: 600px;
+    height: 600px;
+    background-color: #444;
+    border: 2px solid #fff;
+}
+
+#player, #goal, .obstacle 
+{
+    position: absolute;
+    width: 20px;
+    height: 20px;
+}
+
+
+#player
+ {
+    background-color: lime;
+    top: 10px;
+    left: 10px;
+}
+
+
+#goal 
+{
+    background-color: red;
+    bottom: 10px;
+    right: 10px;
+}
+
+
+.obstacle
+{
+    background-color: orange;
+}
