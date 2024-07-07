@@ -1,112 +1,160 @@
-const player = document.getElementById('player');
-const goal = document.getElementById('goal');
-const container = document.getElementById('gameContainer');
-const numObstacles = 50;
-
-
-
-let playerPos = { top: 10, left: 10 };
-let goalPos = { top: 0, left: 0 };
-
-
-
-document.addEventListener('keydown', (e) => {
-    switch(e.key) {
-        case 'ArrowUp': movePlayer(-10, 0); break;
-        case 'ArrowDown': movePlayer(10, 0); break;
-        case 'ArrowLeft': movePlayer(0, -10); break;
-        case 'ArrowRight': movePlayer(0, 10); break;
-    }
-    if (checkCollision(player, goal)) {
-        alert('You Win!');
-        resetGame();
-    }
-    document.querySelectorAll('.obstacle').forEach(obstacle => {
-        if (checkCollision(player, obstacle)) {
-            alert('Game Over!');
-            resetGame();
-        }
-    });
-});
-
-
-
-
-function movePlayer(topChange, leftChange)
+function getRandomInt(max) 
 {
-    playerPos.top += topChange;
-    playerPos.left += leftChange;
-    player.style.top = playerPos.top + 'px';
-    player.style.left = playerPos.left + 'px';
-    keepInBounds();
+    return Math.floor(Math.random() * max);
 }
 
 
 
-function keepInBounds() 
-{
-    if (playerPos.top < 0) playerPos.top = 0;
-    if (playerPos.left < 0) playerPos.left = 0;
-    if (playerPos.top > container.clientHeight - player.clientHeight) 
-        playerPos.top = container.clientHeight - player.clientHeight;
-    if (playerPos.left > container.clientWidth - player.clientWidth) 
-        playerPos.left = container.clientWidth - player.clientWidth;
-    player.style.top = playerPos.top + 'px';
-    player.style.left = playerPos.left + 'px';
-}
-
-
-
-function checkCollision(rect1, rect2)
+function shuffleArray(array)
  {
-    const r1 = rect1.getBoundingClientRect();
-    const r2 = rect2.getBoundingClientRect();
-    return !(r2.left > r1.right || r2.right < r1.left || r2.top > r1.bottom || r2.bottom < r1.top);
-}
-
-
-function resetGame() 
-{
-    playerPos = { top: 10, left: 10 };
-    player.style.top = playerPos.top + 'px';
-    player.style.left = playerPos.left + 'px';
-    randomizeGoalPosition();
-    randomizeObstacles();
-}
-
-
-function createObstacles() 
-{
-    for (let i = 0; i < numObstacles; i++) {
-        const obstacle = document.createElement('div');
-        obstacle.classList.add('obstacle');
-        container.appendChild(obstacle);
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
     }
-    randomizeObstacles();
+    return array;
 }
 
 
-function randomizeGoalPosition() 
+
+function adjustBrightness(factor, image)
+ {
+    const virtualCanvas = document.createElement("canvas");
+    virtualCanvas.width = 500;
+    virtualCanvas.height = 500;
+    const context = virtualCanvas.getContext("2d");
+    context.drawImage(image, 0, 0, 500, 500);
+
+    const imageData = context.getImageData(0, 0, 500, 500);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        data[i] = data[i] * factor;
+        data[i + 1] = data[i + 1] * factor;
+        data[i + 2] = data[i + 2] * factor;
+    }
+    context.putImageData(imageData, 0, 0);
+
+    const brightenedImage = new Image();
+    brightenedImage.src = virtualCanvas.toDataURL();
+    return brightenedImage;
+}
+
+
+
+function showVictoryMessage(moves) 
 {
-    goalPos.top = Math.floor(Math.random() * (container.clientHeight - goal.clientHeight));
-    goalPos.left = Math.floor(Math.random() * (container.clientWidth - goal.clientWidth));
-    goal.style.top = goalPos.top + 'px';
-    goal.style.left = goalPos.left + 'px';
+    document.getElementById("moves").innerText = `You Moved ${moves} Steps.`;
+    toggleVisibility("Message-Container");
 }
 
 
-function randomizeObstacles() 
+function toggleVisibility(id) 
 {
-    document.querySelectorAll('.obstacle').forEach(obstacle => {
-        const top = Math.floor(Math.random() * (container.clientHeight - obstacle.clientHeight));
-        const left = Math.floor(Math.random() * (container.clientWidth - obstacle.clientWidth));
-        obstacle.style.top = top + 'px';
-        obstacle.style.left = left + 'px';
-    });
+    const element = document.getElementById(id);
+    element.style.visibility = element.style.visibility === "visible" ? "hidden" : "visible";
 }
 
 
 
-createObstacles();
-randomizeGoalPosition();
-resetGame();
+function Maze(width, height)
+ {
+    let mazeMap;
+    const startCoord = {};
+    const endCoord = {};
+    const directions = ["n", "s", "e", "w"];
+    const modDir = {
+        n: { y: -1, x: 0, o: "s" },
+        s: { y: 1, x: 0, o: "n" },
+        e: { y: 0, x: 1, o: "w" },
+        w: { y: 0, x: -1, o: "e" }
+    };
+
+    this.map = function() {
+        return mazeMap;
+    };
+    this.startCoord = function() {
+        return startCoord;
+    };
+    this.endCoord = function() {
+        return endCoord;
+    };
+
+    function generateMap() {
+        mazeMap = Array.from({ length: height }, () => Array.from({ length: width }, () => ({
+            n: false,
+            s: false,
+            e: false,
+            w: false,
+            visited: false,
+            priorPos: null
+        })));
+    }
+
+
+
+    function carveMaze() 
+    {
+        let completed = false;
+        let moved = false;
+        let cellsVisited = 1;
+        let pos = { x: 0, y: 0 };
+        const totalCells = width * height;
+        let loopCount = 0;
+        let maxLoops = 0;
+
+        while (!completed) {
+            moved = false;
+            mazeMap[pos.x][pos.y].visited = true;
+
+            if (loopCount >= maxLoops) {
+                shuffleArray(directions);
+                maxLoops = Math.round(getRandomInt(height / 8));
+                loopCount = 0;
+            }
+            loopCount++;
+            
+            for (const direction of directions) {
+                const nx = pos.x + modDir[direction].x;
+                const ny = pos.y + modDir[direction].y;
+
+                if (nx >= 0 && nx < width && ny >= 0 && ny < height && !mazeMap[nx][ny].visited) {
+                    mazeMap[pos.x][pos.y][direction] = true;
+                    mazeMap[nx][ny][modDir[direction].o] = true;
+                    mazeMap[nx][ny].priorPos = pos;
+                    pos = { x: nx, y: ny };
+                    cellsVisited++;
+                    moved = true;
+                    break;
+                }
+            }
+
+            if (!moved) {
+                pos = mazeMap[pos.x][pos.y].priorPos;
+            }
+
+            if (cellsVisited === totalCells) {
+                completed = true;
+            }
+        }
+    }
+
+
+
+    function setStartAndEnd() 
+    {
+        const options = [
+            { start: { x: 0, y: 0 }, end: { x: height - 1, y: width - 1 } },
+            { start: { x: 0, y: width - 1 }, end: { x: height - 1, y: 0 } },
+            { start: { x: height - 1, y: 0 }, end: { x: 0, y: width - 1 } },
+            { start: { x: height - 1, y: width - 1 }, end: { x: 0, y: 0 } }
+        ];
+
+        const choice = options[getRandomInt(4)];
+        Object.assign(startCoord, choice.start);
+        Object.assign(endCoord, choice.end);
+    }
+
+    generateMap();
+    setStartAndEnd();
+    carveMaze();
+}
